@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
@@ -206,8 +207,20 @@ namespace FTP_Server
 
         private void CWD(string path)
         {
-            clientDir = path.Replace('/', '\\');
-            sender.Send(250, " CWD command successful");
+            string tempClientDir = path.Replace('/', '\\');
+            if (Directory.Exists(serverDir + tempClientDir))
+            {
+                if(tempClientDir[tempClientDir.Length - 1] != '\\')
+                {
+                    tempClientDir += '\\';
+                }
+                clientDir = tempClientDir;
+                sender.Send(250, " CWD command successful");
+            }
+            else
+            {
+                sender.Send(500, " wrong path");
+            }
         }
 
         private void RETR(string filename)
