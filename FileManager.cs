@@ -27,12 +27,22 @@ namespace FTP_Server
         public void SendDIR(string serverDir, string clientDir)
         {
             string[] files = Directory.GetFiles(serverDir + clientDir);
-            string[] directorys = Directory.GetDirectories(serverDir + clientDir);
+            string[] directories = Directory.GetDirectories(serverDir + clientDir);
+
+            foreach (string dir in directories)
+            {
+                DirectoryInfo di = new DirectoryInfo(dir);
+                handler.Send(Encoding.ASCII.GetBytes(di.LastWriteTime.ToShortDateString() + " " + di.LastWriteTime.ToShortTimeString() +
+                    "    <DIR> " + di.Name + "\r\n"));
+            }
 
             foreach (string file in files)
             {
-                handler.Send(Encoding.ASCII.GetBytes(Path.GetFileName(file) + "\r\n"));
+                FileInfo fi = new FileInfo(file);
+                handler.Send(Encoding.ASCII.GetBytes(fi.LastWriteTime.ToShortDateString() + " " + fi.LastWriteTime.ToShortTimeString() +
+                    " " +fi.Length + " " + fi.Name + "\r\n"));
             }
+            //handler.Send(Encoding.ASCII.GetBytes("19.02.2021  13:44    <DIR>          Links\r\n"))
 
             handler.Shutdown(SocketShutdown.Send);
             handler.Close();

@@ -208,6 +208,15 @@ namespace FTP_Server
         private void CWD(string path)
         {
             string tempClientDir = path.Replace('/', '\\');
+            if (tempClientDir.Contains(".."))
+            {
+                sender.Send(500, " .. forbidden");
+                return;
+            }
+            if ((tempClientDir.Length > 0) && (tempClientDir[0] != '\\'))
+            {
+                tempClientDir = clientDir + tempClientDir;
+            }
             if (Directory.Exists(serverDir + tempClientDir))
             {
                 if(tempClientDir[tempClientDir.Length - 1] != '\\')
@@ -216,11 +225,10 @@ namespace FTP_Server
                 }
                 clientDir = tempClientDir;
                 sender.Send(250, " CWD command successful");
+                return;
             }
-            else
-            {
-                sender.Send(500, " wrong path");
-            }
+            sender.Send(500, " wrong path");
+            
         }
 
         private void RETR(string filename)
