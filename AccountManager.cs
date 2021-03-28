@@ -33,7 +33,7 @@ namespace FTP_Server
             return false;
         }
 
-        public static bool IsSutable(string login)
+        public static bool IsExists(string login)
         {
             return accounts.ContainsKey(login);
         }

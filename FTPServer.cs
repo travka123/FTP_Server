@@ -60,8 +60,17 @@ namespace FTP_Server
             }
             else if (Regex.IsMatch(command, @"^add username=\S+ pass=\S+$"))
             {
-                ParseUserAddReques(command);
-                Logger.Log("SERVER: User added");
+                string username = Regex.Match(command, @"username=\S+").ToString().Substring(9);
+                string pass = Regex.Match(command, @"pass=\S+").ToString().Substring(5);
+                if (AccountManager.IsExists(username))
+                {
+                    Logger.Log("SERVER: error user already exists");
+                }
+                else
+                {
+                    AccountManager.Add(username, pass);
+                    Logger.Log("SERVER: User added");
+                }
             }
             else
             {
@@ -74,12 +83,6 @@ namespace FTP_Server
             IsWorking = false;
             Logger.Log("SERVER: Closing...");
             Environment.Exit(0);
-        }
-
-        public static void ParseUserAddReques(string command)
-        {
-            AccountManager.Add(Regex.Match(command, @"username=\S+").ToString().Substring(9),
-                Regex.Match(command, @"pass=\S+").ToString().Substring(5));
         }
 
         private static void BeginListen()
