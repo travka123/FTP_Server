@@ -15,7 +15,6 @@ namespace FTP_Server
             InitializeComponent();
             Logger.SetTextBlock(tbLog);
             AccountManager.Add("admin", "admin");
-            FTPServer.Start();
         }
 
         private void tbCommand_KeyDown(object sender, KeyEventArgs e)

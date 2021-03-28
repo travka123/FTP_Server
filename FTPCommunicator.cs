@@ -2,7 +2,6 @@
 using System.IO;
 using System.Net;
 using System.Net.Sockets;
-using System.Text;
 
 namespace FTP_Server
 {
@@ -24,8 +23,22 @@ namespace FTP_Server
         {
             reciver = new FTPReciver(handler);
             sender = new FTPSender(handler);
-            port = ++FileSenderCounts;
-            fileManager = new FileManager(new IPEndPoint(IPAddress.Loopback, 10240 + port));
+
+            bool dataConnectionSet = false;
+            while (!dataConnectionSet)
+            {
+                try
+                {
+                    port = ++FileSenderCounts;
+                    fileManager = new FileManager(new IPEndPoint(IPAddress.Parse(FTPServer.ipAddress), 10240 + port));
+                }
+                catch
+                {
+                    continue;
+                }
+                dataConnectionSet = true;
+            }
+
             serverDir = path;
             clientDir = @"\";
             sender.Send(220, " hello client!");
@@ -195,7 +208,7 @@ namespace FTP_Server
 
         private void PASV()
         {
-            sender.Send(227, " (127,0,0,1,40," + port + ")");
+            sender.Send(227, " (" + FTPServer.ipAddress.Replace('.',',') + ",40," + port + ")");
             fileManager.WaitForConnect();
         }
 

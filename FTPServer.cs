@@ -10,8 +10,10 @@ namespace FTP_Server
 {
     public static class FTPServer
     {
+        public static string ipAddress = null; 
+        public static int commandPort = 21;
+
         private static Socket listener;
-        private static int commandPort = 21;
         private static ManualResetEvent ConnectionRecived = new ManualResetEvent(false);
         private static string serverDir;
 
@@ -20,14 +22,17 @@ namespace FTP_Server
         static FTPServer()
         {
             IsWorking = false;
-            IPEndPoint ipPoint = new IPEndPoint(IPAddress.Loopback, commandPort);
-            listener = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-            listener.Bind(ipPoint);
         }
 
-        public static void Start()
+        public static void Start(string ipAddress)
         {
+            FTPServer.ipAddress = ipAddress;
+
+            IPEndPoint ipPoint = new IPEndPoint(IPAddress.Parse(ipAddress), commandPort);
+            listener = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+            listener.Bind(ipPoint);
             listener.Listen(10);
+
             Logger.Log("SERVER: Hello world!");
             Task.Run(BeginListen);
             IsWorking = true;
@@ -41,7 +46,15 @@ namespace FTP_Server
 
         public static void ExecuteServerCommand(string command)
         {
-            if (Regex.IsMatch(command, @"^stop"))
+            if (Regex.IsMatch(command, @"^start ip=\d{1,3}[.]\d{1,3}[.]\d{1,3}[.]\d{1,3}\s*$"))
+            {
+                Start(command.Substring(9));
+            }
+            else if (Regex.IsMatch(command, @"^start ip=localhost\s*$"))
+            {
+                Start("127.0.0.1");
+            }
+            else if (Regex.IsMatch(command, @"^stop"))
             {
                 Stop();
             }
