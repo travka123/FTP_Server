@@ -4,7 +4,7 @@ using System.Text.RegularExpressions;
 
 namespace FTP_Server
 {
-    public enum ClientCommands { UNKNOWN, CONNECTION_CLOSED, USER, PASS, SYST, FEAT, PWD, TYPE, PASV, LIST, CWD, RETR, STOR, CDUP, MKD }
+    public enum ClientCommands { UNKNOWN, CONNECTION_CLOSED, USER, PASS, SYST, FEAT, PWD, TYPE, PASV, LIST, CWD, RETR, STOR, CDUP, MKD, OPTS }
 
     public struct ClientRequest
     {
@@ -94,6 +94,11 @@ namespace FTP_Server
                     clientRequest.type = ClientCommands.MKD;
                     clientRequest.param = request.Substring(4);
                 }
+                else if (Regex.IsMatch(request, @"^OPTS .*"))
+                {
+                    clientRequest.type = ClientCommands.OPTS;
+                    clientRequest.param = request.Substring(5);
+                }
                 else
                 {
                     clientRequest.type = ClientCommands.UNKNOWN;
@@ -120,7 +125,7 @@ namespace FTP_Server
                 {
                     return null;
                 }
-                commandBuffer.Append(Encoding.ASCII.GetString(buffer), 0, bytes);
+                commandBuffer.Append(Encoding.UTF8.GetString(buffer), 0, bytes);
             }
         }
     }

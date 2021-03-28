@@ -98,6 +98,10 @@ namespace FTP_Server
                             MKD(clientRequest.param);
                             break;
 
+                        case ClientCommands.OPTS:
+                            OPTS(clientRequest.param);
+                            break;
+
                         case ClientCommands.UNKNOWN:
                             sender.Send(500, " unrecognized command");
                             break;
@@ -177,8 +181,9 @@ namespace FTP_Server
         private void FEAT()
         {
             sender.Send(211, "-Extensions supported:");
+
             //Отослать поддерживаемые команды
-            //Пока пусто
+            sender.SendRaw("UTF8");
 
             sender.Send(211, " END");
         }
@@ -208,7 +213,7 @@ namespace FTP_Server
 
         private void PASV()
         {
-            sender.Send(227, " (" + FTPServer.ipAddress.Replace('.',',') + ",40," + port + ")");
+            sender.Send(227, " (" + FTPServer.ipAddress.Replace('.', ',') + ",40," + port + ")");
             fileManager.WaitForConnect();
         }
 
@@ -238,9 +243,10 @@ namespace FTP_Server
             {
                 tempClientDir = clientDir + tempClientDir;
             }
-            if (Directory.Exists(serverDir + tempClientDir))
+            DirectoryInfo di = new DirectoryInfo(serverDir + tempClientDir);
+            if (di.Exists)
             {
-                if(tempClientDir[tempClientDir.Length - 1] != '\\')
+                if (tempClientDir[tempClientDir.Length - 1] != '\\')
                 {
                     tempClientDir += '\\';
                 }
@@ -249,7 +255,7 @@ namespace FTP_Server
                 return;
             }
             sender.Send(500, " wrong path");
-            
+
         }
 
         private void RETR(string filename)
@@ -290,7 +296,7 @@ namespace FTP_Server
                     {
                         sender.Send(550, " directory already exists");
                     }
-                    else 
+                    else
                     {
                         Directory.CreateDirectory(serverDir + directoryName);
                         sender.Send(200, " directory created");
@@ -312,6 +318,22 @@ namespace FTP_Server
             else
             {
                 sender.Send(550, " need name");
+            }
+        }
+
+        private void OPTS(string param)
+        {
+            if (param.Contains("UTF8 ON"))
+            {
+                sender.Send(200, "  UTF8 ON");
+            }
+            else if (param.Contains("UTF8 OFF"))
+            {
+                sender.Send(200, "  UTF8 OFF");
+            }
+            else
+            {
+                sender.Send(500, " args not recognized");
             }
         }
     }

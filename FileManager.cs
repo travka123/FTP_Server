@@ -32,14 +32,14 @@ namespace FTP_Server
             foreach (string dir in directories)
             {
                 DirectoryInfo di = new DirectoryInfo(dir);
-                handler.Send(Encoding.ASCII.GetBytes(di.LastWriteTime.ToShortDateString() + " " + di.LastWriteTime.ToShortTimeString() +
+                handler.Send(Encoding.UTF8.GetBytes(di.LastWriteTime.ToShortDateString() + " " + di.LastWriteTime.ToShortTimeString() +
                     "    <DIR> " + di.Name + "\r\n"));
             }
 
             foreach (string file in files)
             {
                 FileInfo fi = new FileInfo(file);
-                handler.Send(Encoding.ASCII.GetBytes(fi.LastWriteTime.ToShortDateString() + " " + fi.LastWriteTime.ToShortTimeString() +
+                handler.Send(Encoding.UTF8.GetBytes(fi.LastWriteTime.ToShortDateString() + " " + fi.LastWriteTime.ToShortTimeString() +
                     " " +fi.Length + " " + fi.Name + "\r\n"));
             }
             //handler.Send(Encoding.ASCII.GetBytes("19.02.2021  13:44    <DIR>          Links\r\n"))
