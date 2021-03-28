@@ -125,8 +125,7 @@ namespace FTP_Server
                 {
                     return null;
                 }
-                string text = Encoding.UTF8.GetString(buffer);
-                text = text.Substring(0, text.IndexOf('\0'));
+                string text = Encoding.UTF8.GetString(buffer, 0, bytes);
                 commandBuffer.Append(text);
             }
         }

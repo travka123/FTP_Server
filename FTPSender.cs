@@ -15,13 +15,13 @@ namespace FTP_Server
         public void Send(int code, string message)
         {
             Logger.Log("SERVER TO " + handler.RemoteEndPoint + ": " + code + " " + message);
-            handler.Send(Encoding.ASCII.GetBytes(code + message + "\r\n"));
+            handler.Send(Encoding.UTF8.GetBytes(code + message + "\r\n"));
         }
 
         public void SendRaw(string message)
         {
             Logger.Log("SERVER TO " + handler.RemoteEndPoint + ": " + message);
-            handler.Send(Encoding.ASCII.GetBytes(message + "\r\n"));
+            handler.Send(Encoding.UTF8.GetBytes(message + "\r\n"));
         }
     }
 }
