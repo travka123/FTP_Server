@@ -33,7 +33,7 @@ namespace FTP_Server
             }
             else
             {
-                request.Trim();
+                request = request.Trim();
 
                 if (Regex.IsMatch(request, @"^USER .*"))
                 {
@@ -57,7 +57,7 @@ namespace FTP_Server
                 {
                     clientRequest.type = ClientCommands.PWD;
                 }
-                else if (Regex.IsMatch(request, @"^TYPE ."))
+                else if (Regex.IsMatch(request, @"^TYPE .*"))
                 {
                     clientRequest.type = ClientCommands.TYPE;
                     clientRequest.param = request.Substring(5);
@@ -125,7 +125,9 @@ namespace FTP_Server
                 {
                     return null;
                 }
-                commandBuffer.Append(Encoding.UTF8.GetString(buffer), 0, bytes);
+                string text = Encoding.UTF8.GetString(buffer);
+                text = text.Substring(0, text.IndexOf('\0'));
+                commandBuffer.Append(text);
             }
         }
     }

@@ -254,7 +254,10 @@ namespace FTP_Server
                 sender.Send(250, " CWD command successful");
                 return;
             }
-            sender.Send(500, " wrong path");
+            else
+            {
+                sender.Send(500, " wrong path");
+            }
 
         }
 
