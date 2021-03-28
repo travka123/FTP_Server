@@ -77,6 +77,14 @@ namespace FTP_Server
                             STOR(clientRequest.param);
                             break;
 
+                        case ClientCommands.CDUP:
+                            CDUP();
+                            break;
+
+                        case ClientCommands.MKD:
+                            MKD(clientRequest.param);
+                            break;
+
                         case ClientCommands.UNKNOWN:
                             sender.Send(500, " unrecognized command");
                             break;
@@ -187,7 +195,7 @@ namespace FTP_Server
 
         private void PASV()
         {
-            sender.Send(227, "(127,0,0,1,40," + port + ")");
+            sender.Send(227, " (127,0,0,1,40," + port + ")");
             fileManager.WaitForConnect();
         }
 
@@ -243,6 +251,55 @@ namespace FTP_Server
             sender.Send(150, " ready to recive file");
             fileManager.ReciveFile(serverDir + clientDir + filename);
             sender.Send(226, " file recived OK");
+        }
+
+        private void CDUP()
+        {
+            if (clientDir == "\\")
+            {
+                sender.Send(550, " you are in the root directory");
+            }
+            else
+            {
+                clientDir = clientDir.Substring(0, clientDir.Length - 1 - Path.GetFileName(clientDir.Substring(0, clientDir.Length - 1)).Length);
+                sender.Send(250, " CDUP command successful");
+            }
+        }
+
+        private void MKD(string directoryName)
+        {
+            directoryName.Replace('/', '\\');
+            if (directoryName.Length != 0)
+            {
+                if (directoryName[0] == '\\')
+                {
+                    if (Directory.Exists(serverDir + directoryName))
+                    {
+                        sender.Send(550, " directory already exists");
+                    }
+                    else 
+                    {
+                        Directory.CreateDirectory(serverDir + directoryName);
+                        sender.Send(200, " directory created");
+                    }
+                }
+                else
+                {
+                    if (Directory.Exists(serverDir + clientDir + directoryName))
+                    {
+                        sender.Send(550, " directory already exists");
+                    }
+                    else
+                    {
+                        Directory.CreateDirectory(serverDir + clientDir + directoryName);
+                        sender.Send(200, " directory created");
+                    }
+                }
+            }
+            else
+            {
+                sender.Send(550, " need name");
+            }
         }
     }
 }
